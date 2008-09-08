@@ -1,7 +1,7 @@
 # INSTALLATION
-- Copy files to <YOUR INSTALLATION>/app/code/local/Mage/Moneris
-- Copy etc/Mage_Moneris.xml to <YOUR INSTALLATION>/etc/module/Mage_moneris.xml
-- Download Moneris PHP5 lib and install it to <YOUR INSTALLATION>/lib/moneris
+- Copy files to {YOUR INSTALLATION}/app/code/local/Mage/Moneris
+- Copy etc/Mage_Moneris.xml to {YOUR INSTALLATION}/etc/module/Mage_moneris.xml
+- Download Moneris PHP5 lib and install it to {YOUR INSTALLATION}/lib/moneris
 - Set your store id and you api key in the payment module screen in the magento admin
 
 Note by default moneris use their sandbox for the hostname, you need to change them to the appropriate host
