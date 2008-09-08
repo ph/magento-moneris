@@ -32,10 +32,12 @@
 * 
 * The void method is not yet implemented.
 * I am away there is some work to do to make is more robust and more php5-ish.
+*
+* Documentation: http://github.com/ph/magento-moneris/
 * 
 * Pier-Hugues Pellerin ph@heykimo.com
 *
-* Antoine Girard thetoine@gmail.com
+* Thanks to Antoine Girard - toine.ca if you need magento integration contact him.
 */
 set_include_path(get_include_path().PS.Mage::getBaseDir('lib').DS.'moneris');
 require('mpgClasses.php');
