@@ -23,14 +23,18 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *
 *
+*
+*
 * Simple class to add support of the moneris payment gateway to
 * magento the opensource ecommerce.
 *
 * This module is heavily based on the Authorized.net.
 * 
 * The void method is not yet implemented.
+* I am away there is some work to do to make is more robust and more php5-ish.
 * 
 * Pier-Hugues Pellerin ph@heykimo.com
+*
 * Antoine Girard thetoine@gmail.com
 */
 set_include_path(get_include_path().PS.Mage::getBaseDir('lib').DS.'moneris');
@@ -38,14 +42,21 @@ require('mpgClasses.php');
 
 class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
 {
-	/** Constants **/
+	/** 
+	* Constants 
+	**/
 	const TRANSACTION_PREAUTH    = 'preauth';
 	const TRANSACTION_COMPLETION = 'completion';
 	const ERROR_CODE_LIMIT 	     = 50;
 	const ERROR_CODE_UPPER_LIMIT = 1000;
 	const CRYPT_TYPE			 = 7; // SSL enabled merchant
 	
-	
+	/**
+	* Human readable errors from Monoris' CSV file
+	* as of 2008-08-16
+	*
+	* @var array
+	*/
 	protected $_errors = array(
 		'50' => 'Decline',
 		'51' => 'Expired Card',
@@ -198,15 +209,9 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
     */
     protected $_code = 'moneris';
 
-    /**
-     * Here are examples of flags that will determine functionality availability
-     * of this module to be used by frontend and backend.
-     *
-     * @see all flags and their defaults in Mage_Payment_Model_Method_Abstract
-     *
-     * It is possible to have a custom dynamic logic by overloading
-     * public function can* for each flag respectively
-     */
+	/**
+	* Magento defined flags
+	*/
 
     /**
      * Is this payment method a gateway (online auth/charge) ?
@@ -236,7 +241,7 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
     /**
      * Can void transactions online?
      */
-    protected $_canVoid                 = true;
+    protected $_canVoid                 = false;
 
     /**
      * Can use this payment method in administration panel?
@@ -259,103 +264,108 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
     protected $_canSaveCc = false;
 
     /**
-     * Here you will need to implement authorize, capture and void public methods
-     *
-     * @see examples of transaction specific public methods such as
-     * authorize, capture and void in Mage_Paygate_Model_Authorizenet
+     * Authorize a payment for future capture
+	 * 
+     * @var Variant_Object $payment 
+	 * @var Float $amount
      */
 	public function authorize(Varien_Object $payment, $amount)
 	{	
 	
 		$error = false;
 		
-		try {
-			// check for payment
-			if($amount > 0){
-			
-				$payment->setAmount($amount);
+		// check for payment
+		if($amount > 0){
 		
-				// Map magento keys to moneris way
-				$transaction = $this->_build($payment, self::TRANSACTION_PREAUTH);
-				$response = $this->_send($transaction);
-				
-				$payment->setCcApproval($response->getReceiptId())
-	                ->setLastTransId($response->getReceiptId())
-	                ->setCcTransId($response->getTxnNumber())
-	                ->setCcAvsStatus($response->getAuthCode())
-	                ->setCcCidStatus($response->getResponseCode());
+			$payment->setAmount($amount);
 	
+			// Map magento keys to moneris way
+			$transaction = $this->_build($payment, self::TRANSACTION_PREAUTH);
+			$response = $this->_send($transaction);
 			
-				if($response->getResponseCode() > 0 && $response->getResponseCode() <= self::ERROR_CODE_LIMIT) {
-					$payment->setStatus(self::STATUS_APPROVED);
-				} else if($response->getResponseCode() > self::ERROR_CODE_LIMIT && $response->getResponseCode() < self::ERROR_CODE_UPPER_LIMIT) {
-					$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCodes]);
-				} else {
-					$error = Mage::helper('paygate')->__('Incomplete transaction.');
-				}
-			} else{
-			    $error = Mage::helper('paygate')->__('Invalid amount for authorization.');
+			$payment->setCcApproval($response->getReceiptId())
+             ->setLastTransId($response->getReceiptId())
+             ->setCcTransId($response->getTxnNumber())
+             ->setCcAvsStatus($response->getAuthCode())
+             ->setCcCidStatus($response->getResponseCode());
+
+		
+			if($response->getResponseCode() > 0 && $response->getResponseCode() <= self::ERROR_CODE_LIMIT) {
+				$payment->setStatus(self::STATUS_APPROVED);
+			} else if($response->getResponseCode() > self::ERROR_CODE_LIMIT && $response->getResponseCode() < self::ERROR_CODE_UPPER_LIMIT) {
+				$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCodes]);
+			} else {
+				$error = Mage::helper('paygate')->__('Incomplete transaction.');
 			}
-		
-			// we've got something bad here.
-			if ($error !== false) 
-			    Mage::throwException($error);
-		
-			return $this;
+		} else{
+		    $error = Mage::helper('paygate')->__('Invalid amount for authorization.');
 		}
-		catch (Exception $e) {
-			$formatted = preg_replace('/(#\d+)/', '<br />\1	', $e);
-			Mage::throwException($formatted);
-		}
+	
+		// we've got something bad here.
+		if ($error !== false) 
+		    Mage::throwException($error);
+	
+		return $this;
 	}
 	
+	/**
+	* Capture the authorized transaction for a specific order
+	*
+    * @var Variant_Object $payment 
+	* @var Float $amount
+    */
 	public function capture(Varien_Object $payment, $amount) {		
 		$error = false;
 		
-		try {
-			// check for payment
-			if($amount > 0){
-				$payment->setAmount($amount);
+		// check for payment
+		if($amount > 0){
+			$payment->setAmount($amount);
 
-			
-				// Map magento keys to moneris way
-				$transaction = $this->_build($payment, self::TRANSACTION_COMPLETION);
-				$response = $this->_send($transaction);
+		
+			// Map magento keys to moneris way
+			$transaction = $this->_build($payment, self::TRANSACTION_COMPLETION);
+			$response = $this->_send($transaction);
 
-				if($response->getResponseCode() > 0 && $response->getResponseCode() <= self::ERROR_CODE_LIMIT) {
-					$payment->setStatus(self::STATUS_SUCCESS);
-				} else if($response->getResponseCode() > self::ERROR_CODE_LIMIT && $response->getResponseCode() < self::ERROR_CODE_UPPER_LIMIT) {
-					$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCodes]);
-				} else {
-					$error = Mage::helper('paygate')->__('Incomplete transaction.');
-				}
-			} else{
-			    $error = Mage::helper('paygate')->__('Invalid amount for authorization.');
+			if($response->getResponseCode() > 0 && $response->getResponseCode() <= self::ERROR_CODE_LIMIT) {
+				$payment->setStatus(self::STATUS_SUCCESS);
+			} else if($response->getResponseCode() > self::ERROR_CODE_LIMIT && $response->getResponseCode() < self::ERROR_CODE_UPPER_LIMIT) {
+				$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCodes]);
+			} else {
+				$error = Mage::helper('paygate')->__('Incomplete transaction.');
 			}
-	
-	
-			// we've got something bad here.
-			if ($error !== false) 
-			    Mage::throwException($error);
-
-			return $this;
-			
-		} catch (Exception $e) {	
-			$formatted = preg_replace('/(#\d+)/', '<br />\1	', $e);
-			Mage::throwException($formatted);
+		} else{
+		    $error = Mage::helper('paygate')->__('Invalid amount for authorization.');
 		}
+
+
+		// we've got something bad here.
+		if ($error !== false) 
+		    Mage::throwException($error);
+
+		return $this;
+		
 	}
 	
+	/**
+	* Void a transaction, 
+	* This is not yet implemented in this module so you need to do them in the moneris control
+	* panel.
+	*/
 	public function void(Varien_Object $payment) {
-	    Mage::throwException("Not implemented yet.");
+		Mage::throwException("Not yet implemented");
+		return $this;			
 	}
-	
-	
 	
 	/******************************************************************************/
 	/** Custom methods	*/
-	/* send HTTP Request to moneris */
+	
+	/**
+	* Receive a moneris transaction object and send it to the moneris webservice
+	*
+	* @var mpgTransaction $transaction
+	*/
 	public function _send(mpgTransaction $transaction) {
+		
 		$store_id  = $this->getConfigData('store_id');
 		$api_token = $this->getConfigData('api_token');
 		
@@ -366,7 +376,14 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
 		return $mpgHttpsPost->getMpgResponse();
 	}
 	
-	/* build transaction object */
+	/**
+	* Build a moneris transaction object the data of moneris
+	* Make sure the transaction object is the appropriate type for the current
+	* step.
+	*
+	* @var Varien_Object $payment
+	* @var string $type
+	*/
 	public function _build(Varien_Object $payment, $type) {
 		$order    = $payment->getOrder();	
 		$billing  = $order->getBillingAddress();
@@ -378,41 +395,57 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
 								'order_id'	 =>	$order->getIncrementId(),
 								'crypt_type' =>	self::CRYPT_TYPE,
 							);
+	
 							
 		switch($type) {
 			case self::TRANSACTION_PREAUTH :
-				$transaction = array_merge($transaction, array(
+				$transaction = $transaction + array(
 							'cust_id'	 =>	$billing->getCustomerId(),
-							'amount'	 =>	money_format('%i', $payment->getAmount()),
+							'amount'	 =>	sprintf("%01.2f", $payment->getAmount()),
 							'pan'		 =>	$this->_cleanCC($payment->getCcNumber()),
 							'expdate'	 =>	$this->_formatExpirationDate($payment->getCcExpYear(), $payment->getCcExpMonth()),
 							'cvd_value'  => $payment->getCcCid(),
 							'cvd_indicator' => 1
-				));
+				);
 				
 				break;
 			case self::TRANSACTION_COMPLETION :
-				$transaction = array_merge($transaction, array(
-					'comp_amount' => money_format('%i', $payment->getAmount()),
+				$transaction = $transaction + array(
+					'comp_amount' => sprintf("%01.2f", $payment->getAmount()),
 					'txn_number'  => $payment->getCcTransId(),						
-				));
+				);
 				
 				break;
 			case self::TRANSACTION_VOID :
-				$transaction = array_merge($transaction, array(
-					'comp_amount' => money_format('%i', $payment->getAmount()),
+				$transaction = $transaction + array(
+					'comp_amount' => sprintf("%01.2f", $payment->getAmount()),
 					'txn_number'  => $payment->getCcTransId(),
-				));
+				);
 				break;
+
 		}
 
 		return new mpgTransaction($transaction);
 	}
 	
+	/**
+	* Clean the CC number, make sure its only digit.
+	*
+	* @var string $cc
+	*/
 	public function _cleanCC($cc) {
 		return preg_replace('/[^\d]/', '', $cc);
 	}
 	
+	/**
+	* Format the expiration date for the moneris webservice
+	*
+	* The year is in two digit format
+	* 2008-09 become 08-09
+	*
+	* @var string $year
+	* @var string $month
+	*/
 	public function _formatExpirationDate($year, $month) {
 		$year = substr($year, 2, 2); // use two year digits.
 			
