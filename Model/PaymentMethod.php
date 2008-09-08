@@ -418,10 +418,4 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
 			
 		return sprintf("%s%02d", $year, $month);
 	}
-	
-	public function log($message) {
-		$f = fopen(dirname(__FILE__) . '/test.log', 'a');
-		fwrite($f, $message . "\r\n");
-		fclose($f);
-	}
 }
