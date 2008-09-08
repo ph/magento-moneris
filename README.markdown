@@ -21,8 +21,8 @@ Pier-Hugues Pellerin ph - at - heykimo.com
 
 Thanks to Antoine Girard - toine.ca if you need magento integration contact him.
 
-===
-Copyright (c) 2008 Pier-Hugues Pellerin
+
+# Copyright (c) 2008 Pier-Hugues Pellerin
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
