@@ -19,7 +19,7 @@ feel free to send me patches or fork the project.
 
 Pier-Hugues Pellerin ph - at - heykimo.com
 
-Thanks to Antoine Girard - toine.ca if you need magento integration contact him.
+Thanks to Antoine Girard - antoinegirard.com if you need magento integration contact him.
 
 
 # .
