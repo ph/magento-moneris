@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+       <Mage_Moneris>
+          <version>0.0.1</version>
+       </Mage_Moneris>
+    </modules>
+    <global>
+<!-- declare model group for new module -->
+        <models>
+<!-- model group alias to be used in Mage::getModel('newmodule/...') -->
+            <moneris>
+<!-- base class name for the model group -->
+                <class>Mage_Moneris_Model</class>
+            </moneris>
+        </models>
+<!-- declare resource setup for new module -->
+        <resources>
+<!-- resource identifier -->
+            <moneris_setup>
+<!-- specify that this resource is a setup resource and used for upgrades -->
+                <setup>
+<!-- which module to look for install/upgrade files in -->
+                    <module>Mage_Moneris</module>
+                </setup>
+<!-- specify database connection for this resource -->
+                <connection>
+<!-- do not create new connection, use predefined core setup connection -->
+                    <use>core_setup</use>
+                </connection>
+            </moneris_setup>
+            <moneris_write>
+                <use>core_write</use>
+            </moneris_write>
+            <moneris_read>
+                <use>core_read</use>
+            </moneris_read>
+        </resources>
+    </global>
+<!-- declare default configuration values for this module -->
+    <default>
+<!-- 'payment' configuration section (tab) -->
+        <payment>
+<!-- 'newmodule' configuration group (fieldset) -->
+            <moneris>
+<!-- by default this payment method is inactive -->
+                <active>0</active>
+<!-- model to handle logic for this payment method -->
+                <model>moneris/paymentMethod</model>
+<!-- order status for new orders paid by this payment method -->
+                <order_status>1</order_status>
+<!-- default title for payment checkout page and order view page -->
+                <title>Moneris</title>
+                <cctypes>VI,MC</cctypes>
+                <payment_action>authorize</payment_action>
+                <allowspecific>0</allowspecific>
+            </moneris>
+         </payment>
+    </default>
+</config>
