@@ -1,6 +1,8 @@
 <?php
 /**
+* Moneris Magento v0.5 - show me the money release
 *
+* 
 * Copyright (c) 2008 Pier-Hugues Pellerin
 * 
 * Permission is hereby granted, free of charge, to any person obtaining
@@ -295,7 +297,7 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
 			if($response->getResponseCode() > 0 && $response->getResponseCode() <= self::ERROR_CODE_LIMIT) {
 				$payment->setStatus(self::STATUS_APPROVED);
 			} else if($response->getResponseCode() > self::ERROR_CODE_LIMIT && $response->getResponseCode() < self::ERROR_CODE_UPPER_LIMIT) {
-				$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCodes]);
+				$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCode()]);
 			} else {
 				$error = Mage::helper('paygate')->__('Incomplete transaction.');
 			}
@@ -331,7 +333,7 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
 			if($response->getResponseCode() > 0 && $response->getResponseCode() <= self::ERROR_CODE_LIMIT) {
 				$payment->setStatus(self::STATUS_SUCCESS);
 			} else if($response->getResponseCode() > self::ERROR_CODE_LIMIT && $response->getResponseCode() < self::ERROR_CODE_UPPER_LIMIT) {
-				$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCodes]);
+				$error = Mage::helper('paygate')->__($this->_errors[$response->getResponseCode()]);
 			} else {
 				$error = Mage::helper('paygate')->__('Incomplete transaction.');
 			}
@@ -391,10 +393,15 @@ class Mage_Moneris_Model_PaymentMethod extends Mage_Payment_Model_Method_Cc
 		$billing  = $order->getBillingAddress();
 		$shipping = $order->getShippingAddress();
 		
+		# Should be only used in the developement environment
+		# without it we get duplicate order id.
+		$token = $this->getConfigData('order_token');
+		$token = (empty($token)) ? "" : "-" . $token;
+
 
 		$transaction = array(
 								'type'		 =>	$type,
-								'order_id'	 =>	$order->getIncrementId(),
+								'order_id'	 =>	$order->getIncrementId() . $token,
 								'crypt_type' =>	self::CRYPT_TYPE,
 							);
 	

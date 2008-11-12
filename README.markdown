@@ -18,15 +18,15 @@ when pushing them in production, look at their documentation for the right endpo
 
 
 
-feel free to send me patches or fork the project.
+Feel free to send me patches or fork the project.
 
 Pier-Hugues Pellerin ph - at - heykimo.com
 
 Thanks to Antoine Girard - antoinegirard.com if you need magento integration contact him.
 
 
-# .
- 
+---
+
 Copyright (c) 2008 Pier-Hugues Pellerin
 
 Permission is hereby granted, free of charge, to any person obtaining
