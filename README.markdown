@@ -1,3 +1,6 @@
+# Bugs
+Report bugs on http://heykimo.lighthouseapp.com/projects/19632-moneris-magento/overview
+
 # INSTALLATION
 - Copy files to {YOUR INSTALLATION}/app/code/local/Mage/Moneris
 - Copy etc/Mage_Moneris.xml to {YOUR INSTALLATION}/etc/module/Mage_moneris.xml
