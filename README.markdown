@@ -2,13 +2,21 @@
 Report bugs on http://heykimo.lighthouseapp.com/projects/19632-moneris-magento/overview
 
 # INSTALLATION
-- Copy files to {YOUR INSTALLATION}/app/code/local/Mage/Moneris
-- Copy etc/Mage_Moneris.xml to {YOUR INSTALLATION}/etc/module/Mage_moneris.xml
-- Download Moneris PHP5 lib and install it to {YOUR INSTALLATION}/lib/moneris
+- Copy files to {MAGENTO INSTALLATION DIRECTORY}/app/code/local/Mage/Moneris
+- Copy etc/Mage_Moneris.xml to {MAGENTO INSTALLATION DIRECTORY}/app/etc/modules/
+- Copy the patched version of the Moneris PHP5 lib to it to {MAGENTO INSTALLATION DIRECTORY}/lib/moneris
+	The original lib was throwing an error when used in the magento environment, I only added a simple check 
+	when accessing a properties.
 - Set your store id and you api key in the payment module screen in the magento admin
+- Set an order token when you work with the development environment
 
 Note by default moneris use their sandbox for the hostname, you need to change them to the appropriate host
-when pushing them in production, look at their documentation for the right endpoint.
+when pushing them in production, look at their documentation PDF for the right endpoint.
+
+# MONERIS DOCUMENTATION
+
+https://www3.moneris.com/connect/en/process/apis/PHP/index.html
+
 
 # TODO:
 - Implement void
@@ -26,6 +34,7 @@ Thanks to Antoine Girard - antoinegirard.com if you need magento integration con
 
 
 ---
+
 
 Copyright (c) 2008 Pier-Hugues Pellerin
 

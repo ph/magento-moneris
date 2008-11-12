@@ -1,7 +1,7 @@
 <?php
 /**
 * Moneris Magento v0.5 - show me the money release
-*
+* -----------------------------------------------------------------------------
 * 
 * Copyright (c) 2008 Pier-Hugues Pellerin
 * 
@@ -39,7 +39,9 @@
 * 
 * Pier-Hugues Pellerin ph@heykimo.com
 *
-* Thanks to Antoine Girard - antoinegirard.com if you need magento integration contact him.
+* Thanks to Antoine Girard - antoinegirard.com if you need magento integration 
+* contact him.
+*
 */
 set_include_path(get_include_path().PS.Mage::getBaseDir('lib').DS.'moneris');
 require('mpgClasses.php');
