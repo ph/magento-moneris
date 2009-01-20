@@ -7,8 +7,21 @@ Report bugs on http://heykimo.lighthouseapp.com/projects/19632-moneris-magento/o
 - Copy the patched version of the Moneris PHP5 lib to it to {MAGENTO INSTALLATION DIRECTORY}/lib/moneris
 	The original lib was throwing an error when used in the magento environment, I only added a simple check 
 	when accessing a properties.
+- Add the following lines to app/etc/local.xml to ensure the module will show up in the administration panel.
+
+	<modules>
+	    <Mage_Moneris> 
+	        <active>true</active>
+	        <codePool>local</codePool>
+	    </Mage_Moneris>            
+	</modules>   
+
+
 - Set your store id and you api key in the payment module screen in the magento admin
 - Set an order token when you work with the development environment
+
+
+
 
 Note by default moneris use their sandbox for the hostname, you need to change them to the appropriate host
 when pushing them in production, look at their documentation PDF for the right endpoint.
