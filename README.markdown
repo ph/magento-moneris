@@ -9,13 +9,14 @@ Report bugs on http://heykimo.lighthouseapp.com/projects/19632-moneris-magento/o
 	when accessing a properties.
 - Add the following lines to app/etc/local.xml to ensure the module will show up in the administration panel.
 
-	<modules>
-	    <Mage_Moneris> 
-	        <active>true</active>
-	        <codePool>local</codePool>
-	    </Mage_Moneris>            
-	</modules>   
-
+<code>
+	&lt;modules&gt;
+		&lt;Mage_Moneris&gt; 
+			&lt;active&gt;true&lt;/active&gt;
+			&lt;codePool&gt;local&lt;/codePool&gt;
+		&lt;/Mage_Moneris&gt;
+	&lt;/modules&gt;
+</code>
 
 - Set your store id and you api key in the payment module screen in the magento admin
 - Set an order token when you work with the development environment
