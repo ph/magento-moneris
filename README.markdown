@@ -1,5 +1,5 @@
 # Bugs
-Report bugs on git@github.com:ph/magento-moneris.git
+Report bugs on http://github.com/ph/magento-moneris/issues
 
 # INSTALLATION
 - Copy files to {MAGENTO INSTALLATION DIRECTORY}/app/code/local/Mage/Moneris
