@@ -1,3 +1,7 @@
+# NOT SUPPORTED ANYMORE 
+
+--
+
 # Bugs
 Report bugs on http://github.com/ph/magento-moneris/issues
 
